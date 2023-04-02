@@ -1,10 +1,12 @@
 import * as twgl from 'twgl.js';
+import { Graph } from './Graph';
 const vert = require('../shaders/shader.vert');
-const frag = require('../shaders/shader.frag');
 
 export function main() {
+  const graph = new Graph();
   const gl = (document.getElementById("c") as HTMLCanvasElement).getContext("webgl");
-  const programInfo = twgl.createProgramInfo(gl, [vert.sourceCode, frag.sourceCode]);
+  const programInfo = twgl.createProgramInfo(gl, [vert.sourceCode, graph.generateGLSL()]);
+
  
   const arrays = {
     position: [-1, -1, 0, 1, -1, 0, -1, 1, 0, -1, 1, 0, 1, -1, 0, 1, 1, 0],
@@ -17,8 +19,8 @@ export function main() {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
  
     const uniforms = {
-      [frag.uniforms.time.variableName]: time * 0.001,
-      [frag.uniforms.resolution.variableName]: [gl.canvas.width, gl.canvas.height],
+      [graph.uniforms.time.variableName]: time * 0.001,
+      [graph.uniforms.resolution.variableName]: [gl.canvas.width, gl.canvas.height],
     };
  
     gl.useProgram(programInfo.program);
