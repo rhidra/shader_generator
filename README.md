@@ -12,3 +12,6 @@ Implement as a Webpack webapp, using twgl, WebGL and Typescript.
   - [ ] `mix`
   - [ ] `sqrt`
   - [ ] `pow`
+  - [X] `random`
+  - [ ] `voronoi`
+  - [ ] `noise`
