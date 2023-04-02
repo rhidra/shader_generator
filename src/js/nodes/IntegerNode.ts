@@ -1,19 +1,19 @@
 import { DataType } from "../types";
 import { Node } from "./Node";
 
-export class ConstantNode extends Node {
+export class IntegerNode extends Node {
   value: number;
 
   constructor(value: number) {
     super();
-    this.value = value;
+    this.value = Math.floor(value);
   }
 
   generateGLSL(): string {
-    return this.value.toString().includes('.') ? this.value.toString() : this.value.toFixed(1);  
+    return this.value.toFixed(0);  
   }
 
   checkOutputType(): DataType {
-    return DataType.Double;
+    return DataType.Int;
   }
 }

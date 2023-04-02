@@ -1,7 +1,14 @@
-Basic boilerplate project for WebGL and shader experiments
+# Shader generator
 
-- Webpack
-- Typescript
-- SASS/SCSS
-- Twgl
-- Webgl
+Experiment for an evolutive algorithm of shader generation.
+
+Implement as a Webpack webapp, using twgl, WebGL and Typescript.
+
+## TODO
+
+
+- Implement more nodes
+  - [ ] `substract`
+  - [ ] `mix`
+  - [ ] `sqrt`
+  - [ ] `pow`
