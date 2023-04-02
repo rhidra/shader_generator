@@ -1,5 +1,8 @@
-import { AddNode } from "./AddNode";
-import { CosNode } from "./CosNode";
+import { AddNode } from "./nodes/AddNode";
+import { ConstantNode } from "./nodes/ConstantNode";
+import { CosNode } from "./nodes/CosNode";
+import { InputNode } from "./nodes/InputNode";
+import { Node } from "./nodes/Node";
 
 export class Graph {
   uniforms = {
@@ -13,17 +16,21 @@ export class Graph {
     },
   };
 
-  inTime = {generateGLSL: () => 'time'};
-  inX = {generateGLSL: () => 'uv.x'};
-  inY = {generateGLSL: () => 'uv.y'};
+  inTime = new InputNode('time');
+  inX = new InputNode('uv.x');
+  inY = new InputNode('uv.y');
 
-  constructor() {}
+  outR: Node;
+  outG: Node;
+  outB: Node;
+
+  constructor() {
+    this.outR = new AddNode(this.inX, this.inY);
+    this.outG = new AddNode(this.inX, this.inY);
+    this.outB = new CosNode(this.inTime, new ConstantNode(0.1), new ConstantNode(1));
+  }
 
   generateGLSL() {
-    const outR = new AddNode(this.inX, this.inY);
-    const outG = new AddNode(this.inX, this.inY);
-    const outB = new CosNode(this.inTime, 0.1, 1);
-
     const s = (`
       #ifdef GL_ES
       precision mediump float;
@@ -33,7 +40,7 @@ export class Graph {
       void main()
       {
         vec2 uv = gl_FragCoord.xy / resolution.xy;
-        gl_FragColor = vec4(${outR.generateGLSL()}, ${outG.generateGLSL()}, ${outB.generateGLSL()}, 1.);
+        gl_FragColor = vec4(${this.outR.generateGLSL()}, ${this.outG.generateGLSL()}, ${this.outB.generateGLSL()}, 1.);
       }
     `);
 
