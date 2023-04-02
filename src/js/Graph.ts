@@ -9,6 +9,10 @@ import { MultiplyNode } from "./nodes/MultiplyNode";
 import { InvalidTypeError } from "./errors";
 import { VectorDecomposeNode } from "./nodes/VectorDecomposeNode";
 import { IntegerNode } from "./nodes/IntegerNode";
+import { FloorNode } from "./nodes/FloorNode";
+import { FractNode } from "./nodes/FractNode";
+import { RandomNode } from "./nodes/RandomNode";
+import { Vector3Node } from "./nodes/Vector3Node";
 
 export class Graph {
   uniforms = {
@@ -31,14 +35,22 @@ export class Graph {
   outB: Node;
 
   constructor() {
-    this.outR = new AddNode(this.inX, this.inY);
-    this.outG = new MultiplyNode(this.inX, new VectorDecomposeNode(new Vector2Node(this.inX, this.inY), new IntegerNode(1)));
-    this.outB = new CosNode(this.inTime, new ConstantNode(0.1), new ConstantNode(1));
+    const uv = new AddNode(new Vector2Node(this.inX, this.inY), this.inTime);
+    const uvScaled = new MultiplyNode(new ConstantNode(20), uv);
+    const ipos = new FloorNode(uvScaled);
+    const fpos = new FractNode(uvScaled);
+    const color = new RandomNode(ipos);
+
+    this.outR = color;
+    this.outG = color;
+    this.outB = new VectorDecomposeNode(fpos, new IntegerNode(1));
 
     this.compile();
   }
 
   compile() {
+    const t0 = new Date().getTime();
+
     const tr = this.outR.checkOutputType();
     const tg = this.outG.checkOutputType();
     const tb = this.outB.checkOutputType();
@@ -50,10 +62,13 @@ export class Graph {
     } else if (tb !== DataType.Double) {
       throw new InvalidTypeError(`Invalid type for blue output: ${tb}`);
     }
+
+    console.log(`Compile time: ${(new Date().getTime() - t0) / 1000} sec`);
   }
 
   generateGLSL() {
-    const s = (`
+    const t0 = new Date().getTime();
+    const shader = (`
       #ifdef GL_ES
       precision mediump float;
       #endif
@@ -66,9 +81,10 @@ export class Graph {
       }
     `);
 
-      console.log(s);
-      return s;
-    }
+    console.log(`Generation time: ${(new Date().getTime() - t0) / 1000} sec`);
+    console.log(shader);
+    return shader;
+  }
 
     generateUniforms() {
       return `

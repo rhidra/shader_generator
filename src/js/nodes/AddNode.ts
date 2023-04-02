@@ -1,5 +1,6 @@
 import { InvalidTypeError } from "../errors";
 import { DataType } from "../types";
+import { getDataTypeDimension } from "../utils";
 import { Node } from "./Node";
 
 export class AddNode extends Node {
@@ -20,10 +21,21 @@ export class AddNode extends Node {
     const t1 = this.x.checkOutputType();
     const t2 = this.y.checkOutputType();
 
+    // Component wise addition
     if (t1 === t2) {
       return t1;
-    } else {
-      throw new InvalidTypeError(`Cannot add ${t1} and ${t2}`);
     }
+
+    const d1 = getDataTypeDimension(t1);
+    const d2 = getDataTypeDimension(t2);
+
+    // Scalar addition
+    if (d1 === 1 && d2 > 1) {
+      return t2;
+    } else if (d2 === 1 && d1 > 1) {
+      return t1;
+    }
+
+    throw new InvalidTypeError(`Cannot add ${t1} and ${t2}`);
   }
 }
